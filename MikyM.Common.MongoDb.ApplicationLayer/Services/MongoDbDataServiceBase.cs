@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MikyM.Common.MongoDb.ApplicationLayer.Interfaces;
+using MikyM.Common.MongoDb.DataAccessLayer.Context;
 using MikyM.Common.MongoDb.DataAccessLayer.UnitOfWork;
 using MikyM.Common.Utilities.Results;
 
@@ -8,25 +9,25 @@ namespace MikyM.Common.MongoDb.ApplicationLayer.Services;
 /// <summary>
 /// Base data service
 /// </summary>
-/// <inheritdoc cref="IMongoDbDataServiceBase"/>
-public abstract class MongoDbDataServiceBase : IMongoDbDataServiceBase
+/// <inheritdoc cref="IMongoDbDataServiceBase{TContext}"/>
+public abstract class MongoDbDataServiceBase<TContext> : IMongoDbDataServiceBase<TContext> where TContext : MongoDbContext
 {
     /// <summary>
     /// <see cref="IMapper"/> instance
     /// </summary>
     protected readonly IMapper Mapper;
     /// <summary>
-    /// <see cref="IMongoDbUnitOfWork"/> instance
+    /// <see cref="IMongoDbUnitOfWork{TContext}"/> instance
     /// </summary>
-    protected readonly IMongoDbUnitOfWork UnitOfWork;
+    protected readonly IMongoDbUnitOfWork<TContext> UnitOfWork;
     private bool _disposed;
 
     /// <summary>
-    /// Creates a new instance of <see cref="MongoDbDataServiceBase"/>
+    /// Creates a new instance of <see cref="MongoDbDataServiceBase{TContext}"/>
     /// </summary>
     /// <param name="mapper">Instance of <see cref="IMapper"/></param>
     /// <param name="uof">Instance of <see cref="IMongoDbUnitOfWork"/></param>
-    protected MongoDbDataServiceBase(IMapper mapper, IMongoDbUnitOfWork uof)
+    protected MongoDbDataServiceBase(IMapper mapper, IMongoDbUnitOfWork<TContext> uof)
     {
         Mapper = mapper;
         UnitOfWork = uof;
@@ -52,6 +53,9 @@ public abstract class MongoDbDataServiceBase : IMongoDbDataServiceBase
         await UnitOfWork.RollbackAsync();
         return Result.FromSuccess();
     }
+
+    /// <inheritdoc />
+    public TContext Context => UnitOfWork.Context;
 
     // Public implementation of Dispose pattern callable by consumers.
     /// <inheritdoc />

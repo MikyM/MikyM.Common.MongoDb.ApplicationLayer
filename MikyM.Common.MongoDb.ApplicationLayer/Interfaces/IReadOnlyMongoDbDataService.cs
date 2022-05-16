@@ -1,4 +1,5 @@
 ﻿using MikyM.Common.MongoDb.DataAccessLayer;
+using MikyM.Common.MongoDb.DataAccessLayer.Context;
 using MikyM.Common.Utilities.Results;
 
 namespace MikyM.Common.MongoDb.ApplicationLayer.Interfaces;
@@ -6,9 +7,10 @@ namespace MikyM.Common.MongoDb.ApplicationLayer.Interfaces;
 /// <summary>
 /// Read-only data service
 /// </summary>
-/// <typeparam name="TEntity">Type of the entity to create the service for, must derive from <see cref="AggregateRootEntity"/></typeparam>
-public interface IReadOnlyMongoDbDataService<TEntity> : IMongoDbDataServiceBase
-    where TEntity : SnowflakeMongoDbEntity
+/// <typeparam name="TEntity">Type of the entity to create the service for, must derive from <see cref="SnowflakeMongoDbEntity"/></typeparam>
+/// <typeparam name="TContext">Mongo DB context type</typeparam>
+public interface IReadOnlyMongoDbDataService<TEntity, TContext> : IMongoDbDataServiceBase<TContext>
+    where TEntity : SnowflakeMongoDbEntity where TContext : MongoDbContext
 {
     /// <summary>
     /// Gets an entity based on given primary key values

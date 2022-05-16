@@ -5,6 +5,7 @@ using Autofac.Extras.DynamicProxy;
 using Castle.DynamicProxy;
 using Microsoft.Extensions.Options;
 using MikyM.Common.ApplicationLayer;
+using MikyM.Common.ApplicationLayer.Interfaces;
 using MikyM.Common.MongoDb.ApplicationLayer.Interfaces;
 using MikyM.Common.MongoDb.ApplicationLayer.Services;
 
@@ -42,8 +43,6 @@ public static class DependancyInjectionExtensions
         var config = new MongoDbServiceApplicationConfiguration(applicationConfiguration);
         options?.Invoke(config);
 
-        builder.RegisterType<MongoDbDataServiceFactory>().As<IMongoDbDataServiceFactory>().InstancePerLifetimeScope();
-        
         builder.Register(x => config).As<IOptions<MongoDbServiceApplicationConfiguration>>().SingleInstance();
         
         IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> registReadOnlyBuilder;
@@ -52,43 +51,43 @@ public static class DependancyInjectionExtensions
         switch (config.BaseGenericDataServiceLifetime)
         {
             case Lifetime.SingleInstance:
-                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<>))
-                    .As(typeof(IReadOnlyMongoDbDataService<>))
+                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<,>))
+                    .As(typeof(IReadOnlyMongoDbDataService<,>))
                     .SingleInstance();
-                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<>))
-                    .As(typeof(ICrudMongoDbDataService<>))
+                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<,>))
+                    .As(typeof(ICrudMongoDbDataService<,>))
                     .SingleInstance();
                 break;
             case Lifetime.InstancePerRequest:
-                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<>))
-                    .As(typeof(IReadOnlyMongoDbDataService<>))
+                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<,>))
+                    .As(typeof(IReadOnlyMongoDbDataService<,>))
                     .InstancePerRequest();
-                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<>))
-                    .As(typeof(ICrudMongoDbDataService<>))
+                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<,>))
+                    .As(typeof(ICrudMongoDbDataService<,>))
                     .InstancePerRequest();
                 break;
             case Lifetime.InstancePerLifetimeScope:
-                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<>))
-                    .As(typeof(IReadOnlyMongoDbDataService<>))
+                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<,>))
+                    .As(typeof(IReadOnlyMongoDbDataService<,>))
                     .InstancePerLifetimeScope();
-                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<>))
-                    .As(typeof(ICrudMongoDbDataService<>))
+                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<,>))
+                    .As(typeof(ICrudMongoDbDataService<,>))
                     .InstancePerLifetimeScope();
                 break;
             case Lifetime.InstancePerMatchingLifetimeScope:
-                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<>))
-                    .As(typeof(IReadOnlyMongoDbDataService<>))
+                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<,>))
+                    .As(typeof(IReadOnlyMongoDbDataService<,>))
                     .InstancePerMatchingLifetimeScope();
-                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<>))
-                    .As(typeof(ICrudMongoDbDataService<>))
+                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<,>))
+                    .As(typeof(ICrudMongoDbDataService<,>))
                     .InstancePerMatchingLifetimeScope();
                 break;
             case Lifetime.InstancePerDependancy:
-                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<>))
-                    .As(typeof(IReadOnlyMongoDbDataService<>))
+                registReadOnlyBuilder = builder.RegisterGeneric(typeof(ReadOnlyMongoDbDataService<,>))
+                    .As(typeof(IReadOnlyMongoDbDataService<,>))
                     .InstancePerDependency();
-                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<>))
-                    .As(typeof(ICrudMongoDbDataService<>))
+                registCrudBuilder = builder.RegisterGeneric(typeof(CrudMongoDbDataService<,>))
+                    .As(typeof(ICrudMongoDbDataService<,>))
                     .InstancePerDependency();
                 break;
             case Lifetime.InstancePerOwned:
@@ -157,14 +156,14 @@ public static class DependancyInjectionExtensions
             }
         }
 
-        var excluded = new[] { typeof(MongoDbDataServiceBase), typeof(CrudMongoDbDataService<>), typeof(ReadOnlyMongoDbDataService<>) };
+        var excluded = new[] { typeof(IDataServiceBase<>), typeof(MongoDbDataServiceBase<>), typeof(CrudMongoDbDataService<,>), typeof(ReadOnlyMongoDbDataService<,>) };
 
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
             var dataSubSet = assembly.GetTypes()
                 .Where(x => x.GetInterfaces()
                                 .Any(y => y.IsGenericType &&
-                                          y.GetGenericTypeDefinition() == typeof(IMongoDbDataServiceBase)) &&
+                                          y.GetGenericTypeDefinition() == typeof(IMongoDbDataServiceBase<>)) &&
                             x.IsClass && !x.IsAbstract)
                 .ToList();
             

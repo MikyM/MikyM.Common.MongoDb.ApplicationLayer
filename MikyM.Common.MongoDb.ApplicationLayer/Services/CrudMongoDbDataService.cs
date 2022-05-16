@@ -2,6 +2,7 @@
 using MikyM.Common.DataAccessLayer.Repositories;
 using MikyM.Common.MongoDb.ApplicationLayer.Interfaces;
 using MikyM.Common.MongoDb.DataAccessLayer;
+using MikyM.Common.MongoDb.DataAccessLayer.Context;
 using MikyM.Common.MongoDb.DataAccessLayer.Repositories;
 using MikyM.Common.MongoDb.DataAccessLayer.UnitOfWork;
 using MikyM.Common.Utilities.Results;
@@ -13,16 +14,16 @@ namespace MikyM.Common.MongoDb.ApplicationLayer.Services;
 /// <summary>
 /// CRUD data service
 /// </summary>
-/// <inheritdoc cref="ICrudMongoDbDataService{TEntity}"/>
-public class CrudMongoDbDataService<TEntity> : ReadOnlyMongoDbDataService<TEntity>, ICrudMongoDbDataService<TEntity>
-    where TEntity : SnowflakeMongoDbEntity
+/// <inheritdoc cref="ICrudMongoDbDataService{TEntity,TContext}"/>
+public class CrudMongoDbDataService<TEntity, TContext> : ReadOnlyMongoDbDataService<TEntity, TContext>, ICrudMongoDbDataService<TEntity, TContext>
+    where TEntity : SnowflakeMongoDbEntity where TContext : MongoDbContext
 {
     /// <summary>
-    /// Creates a new instance of <see cref="CrudMongoDbDataService{TEntity}"/>
+    /// Creates a new instance of <see cref="CrudMongoDbDataService{TEntity,TContext}"/>
     /// </summary>
     /// <param name="mapper">Mapper instance</param>
     /// <param name="uof">Unit of work instance</param>
-    public CrudMongoDbDataService(IMapper mapper, IMongoDbUnitOfWork uof) : base(mapper, uof)
+    public CrudMongoDbDataService(IMapper mapper, IMongoDbUnitOfWork<TContext> uof) : base(mapper, uof)
     {
     }
 

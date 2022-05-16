@@ -1,4 +1,5 @@
 ﻿using MikyM.Common.MongoDb.DataAccessLayer;
+using MikyM.Common.MongoDb.DataAccessLayer.Context;
 using MikyM.Common.Utilities.Results;
 
 namespace MikyM.Common.MongoDb.ApplicationLayer.Interfaces;
@@ -6,8 +7,10 @@ namespace MikyM.Common.MongoDb.ApplicationLayer.Interfaces;
 /// <summary>
 /// CRUD data service
 /// </summary>
-public interface ICrudMongoDbDataService<TEntity> : IReadOnlyMongoDbDataService<TEntity>
-    where TEntity : SnowflakeMongoDbEntity
+/// <typeparam name="TEntity">Type of the entity to create the service for, must derive from <see cref="SnowflakeMongoDbEntity"/></typeparam>
+/// <typeparam name="TContext">Mongo DB context type</typeparam>
+public interface ICrudMongoDbDataService<TEntity, TContext> : IReadOnlyMongoDbDataService<TEntity, TContext>
+    where TEntity : SnowflakeMongoDbEntity where  TContext : MongoDbContext
 {
     /// <summary>
     /// Adds an entry

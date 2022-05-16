@@ -2,6 +2,7 @@
 using MikyM.Common.DataAccessLayer.Repositories;
 using MikyM.Common.MongoDb.ApplicationLayer.Interfaces;
 using MikyM.Common.MongoDb.DataAccessLayer;
+using MikyM.Common.MongoDb.DataAccessLayer.Context;
 using MikyM.Common.MongoDb.DataAccessLayer.Repositories;
 using MikyM.Common.MongoDb.DataAccessLayer.UnitOfWork;
 using MikyM.Common.Utilities.Results;
@@ -12,16 +13,16 @@ namespace MikyM.Common.MongoDb.ApplicationLayer.Services;
 /// <summary>
 /// Read-only data service
 /// </summary>
-/// <inheritdoc cref="IReadOnlyMongoDbDataService{TEntity}"/>
-public class ReadOnlyMongoDbDataService<TEntity> : MongoDbDataServiceBase, IReadOnlyMongoDbDataService<TEntity>
-    where TEntity : SnowflakeMongoDbEntity
+/// <inheritdoc cref="IReadOnlyMongoDbDataService{TEntity,TContext}"/>
+public class ReadOnlyMongoDbDataService<TEntity, TContext> : MongoDbDataServiceBase<TContext>, IReadOnlyMongoDbDataService<TEntity, TContext>
+    where TEntity : SnowflakeMongoDbEntity where TContext : MongoDbContext
 {
     /// <summary>
-    /// Creates a new instance of <see cref="IReadOnlyMongoDbDataService{TEntity}"/>
+    /// Creates a new instance of <see cref="IReadOnlyMongoDbDataService{TEntity,TContext}"/>
     /// </summary>
     /// <param name="mapper">Instance of <see cref="IMapper"/></param>
-    /// <param name="uof">Instance of <see cref="IMongoDbUnitOfWork"/></param>
-    public ReadOnlyMongoDbDataService(IMapper mapper, IMongoDbUnitOfWork uof) : base(mapper, uof)
+    /// <param name="uof">Instance of <see cref="IMongoDbUnitOfWork{TContext}"/></param>
+    public ReadOnlyMongoDbDataService(IMapper mapper, IMongoDbUnitOfWork<TContext> uof) : base(mapper, uof)
     {
     }
 
